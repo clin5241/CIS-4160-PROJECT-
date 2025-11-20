@@ -11,29 +11,51 @@ function App() {
   .then(json => console.log(json));
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="container">
+
+      <h1 className="title">NutriTrack — Food Info & Health Checker</h1>
+
+      <div className="search-bar">
+        <input 
+          className="input"
+          type="text"
+          placeholder="Search for food (e.g. banana, ramen)"
+        />
+        <button className="button">Search</button>
       </div>
-      <h1>Vite + React</h1>
+
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
+        <h2 className="section-title">Food Information</h2>
+        <p className="placeholder">
+          Food info will appear here once connected to API.
         </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+      <div className="card">
+        <h2 className="section-title">Nutrition Facts</h2>
+        <ul className="list">
+          <li>Calories: —</li>
+          <li>Sugar: —</li>
+          <li>Fat: —</li>
+          <li>Protein: —</li>
+        </ul>
+      </div>
+
+      <div className="card">
+        <h2 className="section-title">Health Grade</h2>
+        
+        <div className="health-bar-bg">
+          <div 
+            className="health-bar-fill"
+            style={{ width: "0%" }}
+          ></div>
+        </div>
+
+        <p className="placeholder">Grade will appear waiting on API data.</p>
+      </div>
+
+    </div>
+  );
 }
 
 export default App
