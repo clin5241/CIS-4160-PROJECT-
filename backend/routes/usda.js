@@ -56,39 +56,30 @@ router.get("/", async (req, res) => {
       `https://api.nal.usda.gov/fdc/v1/foods/search?` +
       `api_key=${process.env.USDA_KEY}` +
       `&query=${encodeURIComponent(query)}` +
-      `&dataType=Foundation` +
-      `&pageSize=25`;
+      `&pageSize=10`;
 
     console.log("Search URL:", searchUrl);
 
     let searchData = await safeFetchJSON(searchUrl);
 
     if (searchData.htmlError) {
+      console.log("HTML error on first try — retrying...");
       searchData = await safeFetchJSON(searchUrl);
     }
 
-    if (!searchData.foods || searchData.foods.length === 0) {
-      return res.json({ error: "No raw food found" });
+    if (!searchData || !searchData.foods || searchData.foods.length === 0) {
+      return res.json({ error: "Food not found" });
     }
 
-    // PRIORITY: find RAW version
-    let rawMatch = searchData.foods.find(food =>
-      food.description.toLowerCase().includes("raw")
-    );
+    const bestMatch = searchData.foods[0];
 
-    // If nothing explicitly says RAW, fallback to first Foundation result
-    if (!rawMatch) {
-      rawMatch = searchData.foods[0];
-    }
-
-    const fdcId = rawMatch.fdcId;
-    console.log("RAW FOOD SELECTED:", rawMatch.description);
-    console.log("FDC ID:", fdcId);
+    console.log("BEST MATCH:", bestMatch.description);
+    console.log("FDC ID:", bestMatch.fdcId);
 
     const detailUrl =
-      `https://api.nal.usda.gov/fdc/v1/food/${fdcId}?api_key=${process.env.USDA_KEY}`;
+      `https://api.nal.usda.gov/fdc/v1/food/${bestMatch.fdcId}?api_key=${process.env.USDA_KEY}`;
 
-    const detailData = await safeFetchJSON(detailUrl);
+    let detailData = await safeFetchJSON(detailUrl);
 
     if (detailData.htmlError || detailData.parseError) {
       return res.status(503).json({
