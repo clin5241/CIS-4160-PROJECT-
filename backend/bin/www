@@ -1,37 +1,29 @@
 #!/usr/bin/env node
 
-
 /**
 * Module dependencies.
 */
-
 
 import app from "../app.js";
 import debug from "debug";
 import { createServer } from "http";
 
-
 debug("back-end:server");
-
 
 /**
 * Get port from environment and store in Express.
 */
 
-
 //var port = normalizePort(process.env.PORT || '3000');
 const port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);  
-
 
 /**
 * Create HTTP server.
 */
 
-
 //var server = createServer(app);
 const server = createServer(app);
-
 
 /**
 * Listen on provided port.
@@ -40,19 +32,16 @@ server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
 
-
 /**
 * Normalize a port.
 */
 function normalizePort(val) {
  const port = parseInt(val, 10);
 
-
  if (isNaN(port)) return val;
  if (port >= 0) return port;
  return false;
 }
-
 
 /**
 * Error handler.
@@ -62,15 +51,12 @@ function onError(error) {
 //throw error;
 //}
 
-
 //var bind = typeof port === 'string'
 //? 'Pipe ' + port
 //: 'Port ' + port;
 
-
  const bind =
    typeof port === "string" ? "Pipe " + port : "Port " + port;
-
 
  switch (error.code) {
    case "EACCES":
@@ -85,12 +71,10 @@ function onError(error) {
 //process.exit(1);
 //break;
 
-
    default:
      throw error;
  }
 }
-
 
 function onListening() {
  const addr = server.address();

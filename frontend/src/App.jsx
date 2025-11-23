@@ -3,7 +3,6 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
-
 function App() {
  const [query, setQuery] = useState("");
  const [food, setFood] = useState(null);
@@ -11,24 +10,19 @@ function App() {
  const [data, setData] = useState(null);
  const [loading, setLoading] = useState(false);
 
-
  const searchFood = async () => {
    setError("");
    setData(null);
-
 
    if (!query.trim()) {
      setError("Please enter a food name.");
      return;
    }
 
-
    setLoading(true);
-
 
    try {
      const res = await fetch(`/api/usda?q=${encodeURIComponent(query)}`);
-
 
      if (!res.ok) {
        setError("Server error — try again.");
@@ -36,9 +30,7 @@ function App() {
        return;
      }
 
-
      const json = await res.json();
-
 
      if (json.error) {
        setError("Food not found.");
@@ -46,21 +38,17 @@ function App() {
        return;
      }
 
-
      setData(json);
    } catch (err) {
      setError("Network error.");
    }
 
-
    setLoading(false);
  };
-
 
  return (
    <div className="container">
      <h1 className="title">NutriTrack — Food Info & Health Checker</h1>
-
 
      <div className="search-bar">
        <input
@@ -73,15 +61,12 @@ function App() {
        <button className="button" onClick={searchFood}>Search</button>
      </div>
 
-
      {loading && <p className="loading">Loading...</p>}
      {error && <p className="error">{error}</p>}
-
 
      {!data && !loading && !error && (
        <p className="placeholder">Search for a food item to see its info.</p>
      )}
-
 
      {data && (
        <div className="card">
@@ -99,7 +84,6 @@ function App() {
    </div>
  );
 }
-
 
 export default App;
 
