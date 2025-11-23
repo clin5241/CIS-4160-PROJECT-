@@ -71,7 +71,7 @@ router.get("/", async (req, res) => {
       return res.json({ error: "No raw food found" });
     }
 
-    // ⭐ PRIORITY: find RAW version
+    // PRIORITY: find RAW version
     let rawMatch = searchData.foods.find(food =>
       food.description.toLowerCase().includes("raw")
     );
