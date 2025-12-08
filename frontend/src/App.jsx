@@ -90,14 +90,9 @@ function App() {
           {/* Health score section */}
           {data.healthScore != null && (
             <>
-              <div className="section-title" style={{ marginTop: "16px" }}>
-                Health Score
-              </div>
+              <div className="section-title" style={{ marginTop: "16px" }}> Health Score</div>
               <div className="health-bar-bg">
-                <div
-                  className="health-bar-fill"
-                  style={{ width: `${data.healthScore}%` }}
-                />
+                <div className="health-bar-fill" style={{ width: `${data.healthScore}%` }}/>
               </div>
               <p className="placeholder" style={{ marginTop: "8px" }}>
                 {getHealthLabel(data.healthScore)} (Score: {data.healthScore}/100)
