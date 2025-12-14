@@ -5,7 +5,6 @@ console.log(">>> USDA ROUTER LOADED <<<");
 
 const router = express.Router();
 
-
 function calculateHealthScore({ calories, protein, fat, sugar, fiber }) {
   let score = 50; 
 
