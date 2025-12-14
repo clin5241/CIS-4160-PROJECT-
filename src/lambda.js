@@ -1,5 +1,5 @@
 // src/lambda.js
-const serverlessExpress = require('@vendia/serverless-express');
-const app = require('./app'); // your existing Express app
+import serverlessExpress from '@codegenie/serverless-express';
+import app from './app.js';
 
-exports.handler = serverlessExpress({ app });
+export const handler = serverlessExpress({ app });
