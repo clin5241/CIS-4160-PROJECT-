@@ -28,7 +28,7 @@ function App() {
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/usda?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`https://r3d5we84bl.execute-api.us-west-2.amazonaws.com/api/usda?q=${encodeURIComponent(query)}`);
 
       if (!res.ok) {
         setError("Server error — try again.");
