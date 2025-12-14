@@ -1,51 +1,51 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Small Express app deployed with AWS SAM (Lambda + HTTP API)
-
 Globals:
   Function:
     Runtime: nodejs22.x
-    Timeout: 20           # seconds
+    Timeout: 20
     MemorySize: 512
     Architectures:
-      - x86_64
-
+    - x86_64
 Resources:
   ExpressHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
       CorsConfiguration:
         AllowOrigins:
-          - "*"
+        - '*'
         AllowMethods:
-          - GET
-          - POST
-          - PUT
-          - DELETE
-          - OPTIONS
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
         AllowHeaders:
-          - "*"
-
+        - '*'
   ExpressFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/
-      Handler: lambda.handler    # lambda.js exports.handler
+      CodeUri: ExpressFunction
+      Handler: lambda.handler
       Description: Express app behind HTTP API
       Events:
         Root:
           Type: HttpApi
           Properties:
-            ApiId: !Ref ExpressHttpApi
+            ApiId:
+              Ref: ExpressHttpApi
             Path: /
             Method: ANY
         ProxyApi:
           Type: HttpApi
           Properties:
-            ApiId: !Ref ExpressHttpApi
+            ApiId:
+              Ref: ExpressHttpApi
             Path: /{proxy+}
             Method: ANY
-
+    Metadata:
+      SamResourceId: ExpressFunction
   StaticWebsiteBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -58,38 +58,40 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
-
   StaticWebsiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref StaticWebsiteBucket
+      Bucket:
+        Ref: StaticWebsiteBucket
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Sid: AllowCloudFrontServicePrincipalGetObject
-            Effect: Allow
-            Principal:
-              Service: cloudfront.amazonaws.com
-            Action: s3:GetObject
-            Resource:
-              !Join
-                - ''
-                - - !GetAtt StaticWebsiteBucket.Arn
-                  - '/*'
-            Condition:
-              StringEquals:
-                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
-
+        - Sid: AllowCloudFrontServicePrincipalGetObject
+          Effect: Allow
+          Principal:
+            Service: cloudfront.amazonaws.com
+          Action: s3:GetObject
+          Resource:
+            Fn::Join:
+            - ''
+            - - Fn::GetAtt:
+                - StaticWebsiteBucket
+                - Arn
+              - /*
+          Condition:
+            StringEquals:
+              AWS:SourceArn:
+                Fn::Sub: arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}
   CloudFrontOAC:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Name: !Sub "${AWS::StackName}-oac"
+        Name:
+          Fn::Sub: ${AWS::StackName}-oac
         Description: Access control for S3 origin
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
-
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -98,38 +100,44 @@ Resources:
         DefaultRootObject: index.html
         HttpVersion: http2
         PriceClass: PriceClass_100
-
         Origins:
-          - Id: S3Origin
-            DomainName: !GetAtt StaticWebsiteBucket.RegionalDomainName
-            S3OriginConfig: {}     # required for S3 origins
-            OriginAccessControlId: !Ref CloudFrontOAC
-
+        - Id: S3Origin
+          DomainName:
+            Fn::GetAtt:
+            - StaticWebsiteBucket
+            - RegionalDomainName
+          S3OriginConfig: {}
+          OriginAccessControlId:
+            Ref: CloudFrontOAC
         DefaultCacheBehavior:
           TargetOriginId: S3Origin
           ViewerProtocolPolicy: redirect-to-https
-          AllowedMethods: [GET, HEAD]
+          AllowedMethods:
+          - GET
+          - HEAD
           Compress: true
-          # Managed "CachingDisabled" policy (no caching: all TTLs = 0)
-          # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html
-          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad         
-          OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf  # AWS managed CORS-S3Origin
-
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+          OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf
         ViewerCertificate:
           CloudFrontDefaultCertificate: true
-
 Outputs:
   ApiBaseUrl:
     Description: Base URL for the Express HTTP API
-    Value: !Sub "https://${ExpressHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value:
+      Fn::Sub: https://${ExpressHttpApi}.execute-api.${AWS::Region}.amazonaws.com
   ExpressFunctionArn:
     Description: ARN of the Lambda function running Express
-    Value: !GetAtt ExpressFunction.Arn
+    Value:
+      Fn::GetAtt:
+      - ExpressFunction
+      - Arn
   CloudFrontDomainName:
     Description: CloudFront distribution domain
-    Value: !GetAtt CloudFrontDistribution.DomainName
+    Value:
+      Fn::GetAtt:
+      - CloudFrontDistribution
+      - DomainName
   BucketName:
     Description: Name of the static site bucket
-    Value: !Ref StaticWebsiteBucket
-
-  
+    Value:
+      Ref: StaticWebsiteBucket
