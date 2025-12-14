@@ -29,7 +29,7 @@ Resources:
   ExpressFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: backend/
+      CodeUri: src/
       Handler: lambda.handler    # lambda.js exports.handler
       Description: Express app behind HTTP API
       Events:
