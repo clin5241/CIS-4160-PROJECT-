@@ -1,0 +1,10 @@
+res.json({
+  name,
+  calories,
+  protein,
+  fat,
+  carbs,
+  sugar,
+  fiber,
+  portion: "1 medium (182 g)"
+});
