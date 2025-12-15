@@ -1,12 +1,10 @@
-import express from "express";
-import fetch from "node-fetch";
+// app.js - AWS Lambda compatible Express app
+import express, { json } from 'express';
 
-console.log(">>> USDA ROUTER LOADED <<<");
-
-const router = express.Router();
+const app = express();
 
 function calculateHealthScore({ calories, protein, fat, sugar, fiber }) {
-  let score = 50; 
+  let score = 50;
 
   if (protein != null) {
     score += Math.min(protein * 1.5, 15);
@@ -42,12 +40,12 @@ function extractKeyNutrients(detailData) {
     return item ? item.amount : null;
   };
 
-  const calories = get("208"); 
-  const protein = get("203");  
-  const fat     = get("204");  
-  const carbs   = get("205");  
-  const sugar   = get("269");  
-  const fiber   = get("291");  
+  const calories = get("208");
+  const protein = get("203");
+  const fat = get("204");
+  const carbs = get("205");
+  const sugar = get("269");
+  const fiber = get("291");
 
   const healthScore = calculateHealthScore({
     calories,
@@ -92,7 +90,18 @@ async function safeFetchJSON(url) {
   }
 }
 
-router.get("/", async (req, res) => {
+
+/**
+ * 1. API routes FIRST
+ *    These should respond and then stop; they must come before static/catch-all.
+ */
+app.use(json());
+
+app.get('/api/hello', (req, res) => {
+  res.json({ message: 'Hello from API' });
+});
+
+app.get("/api/usda", async (req, res) => {
   console.log(">>> USDA ROUTE HIT <<<");
 
   const query = req.query.q;
@@ -152,4 +161,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-export default router;
+// Export the app for Lambda handler (do NOT call app.listen() in Lambda)
+export default app;
+
